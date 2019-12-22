@@ -13,7 +13,7 @@ struct TreeNode
 		,right(nullptr)
 	{}
 };
-//递归：
+//思路1：
 class solution1
 {
 	TreeNode* head = nullptr;
@@ -39,7 +39,7 @@ public:
 	}
 };
 
-//非递归：
+//思路2：
 class Solution2 {
 	std::vector<TreeNode*> v;
 public:
