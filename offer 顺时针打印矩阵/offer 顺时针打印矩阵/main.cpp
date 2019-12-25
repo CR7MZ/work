@@ -1,4 +1,5 @@
 //ÌâÄ¿£ºhttps://www.nowcoder.com/questionTerminal/9b4c81a02cd34f76be2659fa0d54342a?f=discussion
+//ÏêÏ¸½âÎö£ºhttps://blog.csdn.net/CR7lmz/article/details/104146334
 #include<iostream>
 #include<vector>
 using namespace std;
