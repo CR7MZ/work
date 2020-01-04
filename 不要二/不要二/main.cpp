@@ -17,6 +17,7 @@ using namespace std;
 //00110011
 //00110011 
 int main()
+
 {
 	vector<int> v[1000];
 	for (int i = 0; i < 1000; i++)//将数组初始化为0
