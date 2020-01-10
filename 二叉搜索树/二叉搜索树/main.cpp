@@ -13,6 +13,7 @@ struct BSTNode
 	T _data;
 };
 
+
 template<class T>
 class BStree
 {
