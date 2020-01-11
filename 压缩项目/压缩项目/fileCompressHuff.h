@@ -5,7 +5,7 @@
 #include<vector>
 struct Char//用来保存字符的种类、出现的字数、以及这个字符新获取到的哈夫曼编码
 {
-	char _s;      //什么字符
+	unsigned char _s;      //什么字符
 	size_t _count;//字符出现的次数
 	std::string _code;//字符哈夫曼编码
 	Char(size_t count = 0)
@@ -26,13 +26,15 @@ struct Char//用来保存字符的种类、出现的字数、以及这个字符新获取到的哈夫曼编码
 };
 class filecompressHuff
 {
-	typedef HuffManTreenode<Char> node;
 public:
 	filecompressHuff();//对_file数组进行初始化。
 	void compressfile(const std::string& s);
 	void UNcompressfile(const std::string& s);
 private:
 	void GetCode(HuffManTreenode<Char>* root);
+	void writehead(FILE* fout, const std::string & filename);
+	std::string getfileback(const std::string& filename);
+	void filecompressHuff::ReadLine(FILE* FIn, std::string& strInfo);
 private:
 	std::vector<Char> _file;//文件中的字符上限256个，定义一个结构体数组，来保存每个字符的种类、出现次数、以及对应生成的Huffman编码
 };

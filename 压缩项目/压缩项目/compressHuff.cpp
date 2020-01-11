@@ -1,5 +1,4 @@
 #include"fileCompressHuff.h"
-#include"huffman tree.hpp"
 #include<assert.h>
 #include<string>
 filecompressHuff::filecompressHuff()
@@ -15,21 +14,21 @@ void filecompressHuff::compressfile(const std::string& s)
 {
 	//1.Í³¼ÆÔ´ÎÄ¼şÖĞÃ¿¸ö×Ö·û³öÏÖµÄ´ÎÊı
 
-	FILE* fIn = fopen("E:\\work\\work\\work\\Ñ¹ËõÏîÄ¿\\Debug\\1.txt", "rb");//´ò¿ªÒ»¸öÎÄ¼ş£¬ÒòÎªfopenÖ»ÄÜ½ÓÊÕC¸ñÊ½×Ö·û´®£¬ËùÒÔÒª×ª³ÉC¸ñÊ½¡£
+	FILE* fIn = fopen(s.c_str(), "rb");//´ò¿ªÒ»¸öÎÄ¼ş£¬ÒòÎªfopenÖ»ÄÜ½ÓÊÕC¸ñÊ½×Ö·û´®£¬ËùÒÔÒª×ª³ÉC¸ñÊ½¡£
 	if (nullptr == fIn)
 	{
 		assert(false);
 		return;
 	}
-	getchar();
 	unsigned char* buff = new unsigned char[1024];//ÓÃÀ´±£´æ´ÓÎÄ¼ş¶Á³öÀ´µÄÊı¾İ¡£
-	int readsize = 0;
+	//ÒòÎª×Ö·û·¶Î§ÊÇ-128-127£¬¸ºÊıÊÇ²»ÄÜ×÷ÎªÏÂ±êµÄ£¬ËùÒÔ²»ÄÜÓÃ×Ö·ûµÄASKiiÂë×÷ÎªÊı×éÏÂ±ê£¬ËùÒÔÓÃÎŞ·ûºÅÀàĞÍ¡£
+	size_t readsize = 0;
 	while (true)//Èç¹ûÒ»´Î¶Á²»Íê£¬·ÅÔÚÑ­»·Àï¶Á
 	{
 		readsize=fread(buff, 1, 1024, fIn);//Ò»¸ö×Ö·ûÕ¼Ò»¸ö×Ö½Ú£¬Ò»´Î¶Á1024¸ö£¬Ò²¾ÍÊÇ1KµÄÊı¾İ
 		if (readsize == 0)//Èç¹ûreadsize==0ËµÃ÷¶ÁÍêÁË
 			break;
-		for (int i = 0; i < readsize; i++)//Í³¼ÆÎÄ¼şÖĞ¶Áµ½ËùÓĞ×Ö·û£¬¸÷×Ô³öÏÖµÄ´ÎÊı¡£
+		for (size_t i = 0; i < readsize; i++)//Í³¼ÆÎÄ¼şÖĞ¶Áµ½ËùÓĞ×Ö·û£¬¸÷×Ô³öÏÖµÄ´ÎÊı¡£
 			_file[buff[i]]._count++;//ÒòÎª_fileÖĞÓĞ256¸öÔªËØ£¬ËùÒÔ¿ÉÒÔ¿´×÷ASKIIÂë£¬
 			                        //ËùÒÔÈôÒªÍ³¼ÆbuffÖĞ×Ö·û³öÏÖµÄ´ÎÊı£¬Ö»ĞèÒª½«buffÀïÃæµÄ×Ö·û×÷Îª_fileÊı×éµÄÏÂ±ê£¬ÕÒµ½¶ÔÓ¦µÄ
 			                       //×Ö·û½á¹¹Ìå£¬Ê¹Æä¼ÆÊı±äÁ¿++¼´¿É¡£
@@ -37,9 +36,7 @@ void filecompressHuff::compressfile(const std::string& s)
 	//2.ÒÔ×Ö·ûµÄ³öÏÖ´ÎÊıÎªÈ¨Öµ´´½¨¹ş·òÂüÊ÷
 
 	Huffmantree<Char> t;
-	Char c;
-	c._count = 0;
-	t.CreatHuffmantree(_file,c);//´Ë´¦´«µÄÊÇ½á¹¹ÌåÊı×é£¬ÈôÒª´´½¨Huffman¾ÍÒªÖØÔØ¹ØÓÚ½á¹¹ÌåµÄ¼Ó·¨ÒÔ¼°´óÓÚºÅ¡£
+	t.CreatHuffmantree(_file, Char(0));//´Ë´¦´«µÄÊÇ½á¹¹ÌåÊı×é£¬ÈôÒª´´½¨Huffman¾ÍÒªÖØÔØ¹ØÓÚ½á¹¹ÌåµÄ¼Ó·¨ÒÔ¼°´óÓÚºÅ¡£
 
 	//3.»ñÈ¡Ã¿¸ö×Ö·ûµÄ±àÂë
 
@@ -47,10 +44,94 @@ void filecompressHuff::compressfile(const std::string& s)
 
 	//4.ÓÃ»ñÈ¡µ½µÄ×Ö·û±àÂëÖØĞÂ¸ÄĞ´Ô­ÎÄ¼ş
 
+	FILE* fout = fopen("2.txt", "wb");//ÓÃÀ´´æ·ÅÖØĞ´ÄÚÈİµÄÎÄ¼ş£¬¾ÍÊÇÑ¹ËõÎÄ¼ş¡£
+	if (nullptr == fout)
+	{
+		assert(false);
+		return;
+	}
+	writehead(fout, s);//ÔÚ½«Ñ¹ËõÊı¾İĞ´ÈëÎÄ¼şÇ°£¬½«½âÑ¹ÓÃµÄ±ØÒªĞÅÏ¢Ğ´ÈëÎÄ¼ş¡£
+
+	fseek(fIn, 0, SEEK_SET);
+	char ch = 0;//±£´æÃ¿Ò»¸ö×Ö½Ú8¸ö±ÈÌØÎ»ÖĞ£¬Ã¿¸ö×Ö·û±àÂë
+	int count = 0;//Í³¼ÆÒ»¸ö×Ö½ÚÖĞ£¬ÒÑ¾­ÓĞ¼¸¸ö±ÈÌØÎ»±»·ÅÁË±àÂë
+	while (true)
+	{
+		readsize = fread(buff, 1, 1024, fIn);
+		if (0 == readsize)
+			break;
+
+		//¸ù¾İ×Ö·ûµÄ±àÂë¶Ô¶ÁÈ¡µÄÎÄ¼şÄÚÈİ½øĞĞÖØĞ´¡£
+		for (size_t i = 0; i < readsize; i++)
+		{
+			std::string strcode = _file[buff[i]]._code;//ÕÒµ½Ô­ÎÄ¼şÖĞ£¬Ã¿¸ö×Ö·û¶ÔÓ¦µÄ±àÂë¡£
+			for (size_t j = 0; j < strcode.size(); j++)//½«±àÂë°´±ÈÌØÎ»·ÅÈëÒ»¸ö×Ö½ÚÖĞ¡£
+				//ÀıÈç£ºA£º011   ÄÇÃ´¾ÍÊÇ½«´Ó0¿ªÊ¼ÒÀ´Î½«ºóÃæµÄ±àÂë£¬·ÅÈëÈı¸ö±ÈÌØÎ»ÖĞ
+			{
+				ch <<= 1;//Ã¿´Î·ÅÈëÒ»¸ö±ÈÌØÎ»ºó£¬½«±ÈÌØÎ»×óÒÆ1Î»£¬¼ÌĞø·ÅÈëÏÂÒ»¸ö
+				if ('1' == strcode[j])
+					ch |= 1;//Èô´ËÊ±·ÅÈëµÄ±àÂëÎª1£¬Õâ¸ö×Ö½Ú°´Î»»ò1¼´¿É£¬Èô·ÅÈëµÄ±àÂëÎª0£¬Ôò²»ÓÃ´¦Àí£¬ÒòÎªÒÑ¾­½«8¸ö±ÈÌØÎ»³õÊ¼»¯Îª0
+
+				count++;
+				if (8 == count)//Èç¹ûÒ»¸ö×Ö½Ú·ÅÂúÁË£¬½«Õâ¸öÖ±½ÓĞ´ÈëÑ¹ËõÎÄ¼şÖĞ¡£
+				{
+					fputc(ch, fout);//fputcÊÇÏòÎÄ¼şÖĞÒ»¸ö×Ö½ÚÒ»¸ö×Ö½ÚµÄĞ´¡£
+					ch = 0;
+					count = 0;
+				}
+			}
+		}
+	}
+	//Ò²ÓĞ¿ÉÄÜ´æÔÚ£¬×îºóÒ»´Îch£¨ÔÚ×îºóÒ»¸ö×Ö½Ú£©ÖĞ¿ÉÄÜ²»Âú8¸ö±ÈÌØÎ»£¬ËùÓĞµÄ±àÂëÒÑ¾­Ğ´Íê£¬Èç¹û²»´¦Àí¾Í»áÔì³É½âÑ¹ÎÄ¼şÓëÔ´ÎÄ¼şÓĞÎó²î¡£
+	if (count < 8)
+	{
+		ch <<= (8 - count);//´ËÊ±Õâ¸ö×Ö½ÚĞ´ÈëÁË¶àÉÙ¸ö±ÈÌØÎ»£¬ÈÃÆä×óÒÆ8-count¸ö±ÈÌØÎ»¼´¿É¡£
+		fputc(ch, fout);
+	}
 
 	delete[] buff;
 	fclose(fIn);
 }
+
+std::string filecompressHuff::getfileback(const std::string& filename)//µÃµ½ÎÄ¼şºó×º
+{
+	return filename.substr(filename.rfind('.'));
+}
+
+void filecompressHuff::writehead(FILE* fout, const std::string & filename)//½«ÎÄ¼şºó×º¡¢ĞĞÊı£¨ÓĞ¼¸ĞĞÄÚÈİÊÇ±£´æ×Ö·û³öÏÖ´ÎÊı£©¡¢×Ö·û³öÏÖ´ÎÊıĞÅÏ¢
+{
+	assert(fout);
+
+	//Ğ´ÈëÎÄ¼şµÄºó×º
+	std::string strhead;//±£´æ½«ÒªĞ´ÈëÑ¹ËõÎÄ¼şÖĞµÄ£¬½âÑ¹ĞÅÏ¢¡£
+	strhead += getfileback(filename);
+	strhead += '\n';
+
+	//Ğ´°üº¬×Ö·ûĞÅÏ¢ĞĞÊı
+
+	size_t linecount = 0;//°üº¬×Ö·ûĞÅÏ¢ĞĞÊı
+	std::string strcount;//ÓÃÀ´±£´æ×Ö·ûĞÅÏ¢
+	char strvalue[32] = { 0 };//½ÓÊÕ×ª»»Îª×Ö·ûÀàĞÍµÄ´ÎÊı
+	for (int i = 0; i < 256; i++)
+	{
+		if (_file[i]._count)//Èç¹û´ÎÊı²»Îª0
+		{
+			linecount++;
+			strcount += _file[i]._s;//·ÅÈë×Ö·û
+			strcount += ':';
+			_itoa(_file[i]._count, strvalue, 10);//½«×Ö·û´ÎÊı£¬×ªÎª×Ö·ûÀàĞÍ¡£
+			strcount += strvalue;//·ÅÈë×Ö·û³öÏÖµÄ´ÎÊı
+			strcount += '\n';
+		}
+	}
+	_itoa(linecount, strvalue, 10);
+	strhead += strvalue;//°ÑĞĞÊı·Å½øÈ¥
+	strhead += '\n';
+	strhead += strcount;//×Ö·ûµÄĞÅÏ¢
+
+	fwrite(strhead.c_str(), 1, strhead.size(), fout);
+}
+
 void filecompressHuff::GetCode(HuffManTreenode<Char> *root)//´ÓÒ¶×Ó½áµãÏò¸ù½ÚµãÕÒµ½£¬Ò²¾ÍÊÇ´ÓÏÂÏòÉÏÕÒ
 {
 	if (nullptr == root)
@@ -60,8 +141,8 @@ void filecompressHuff::GetCode(HuffManTreenode<Char> *root)//´ÓÒ¶×Ó½áµãÏò¸ù½ÚµãÕ
 	if (root->left == nullptr&&root->right == nullptr)//Í¨¹ıµİ¹éÕÒµ½Ò¶×Ó½áµã¡£
 	{
 		std::string strcode;
-		node* cur = root;
-		node* parent = cur->_parent;//parentÎª´ËÊ±curµÄ¸¸½Úµã¡£
+		HuffManTreenode<Char>* parent = root->_parent;//parentÎª´ËÊ±curµÄ¸¸½Úµã¡£
+		HuffManTreenode<Char>* cur = root;
 		while (parent)
 		{
 			if (cur == parent->left)//ÈôcurÔÚparent×ó±ß£¬¸ù¾İÖ®Ç°µÄ¹æ¶¨Îª×Ö·û'0'
@@ -74,5 +155,91 @@ void filecompressHuff::GetCode(HuffManTreenode<Char> *root)//´ÓÒ¶×Ó½áµãÏò¸ù½ÚµãÕ
 		reverse(strcode.begin(), strcode.end());//ÒòÎªÎÒÃÇÊÇ´ÓÏÂÏòÉÏÕÒµÄ±àÂë£¬ËùÒÔ×îºóĞèÒª½«±àÂë·­×ª£¬²ÅÊÇÎÒÃÇÒ»¸ö×Ö·ûµÄ±àÂë¡£
 		_file[root->_weight._s]._code= strcode;//½«¶ÔÓ¦×Ö·ûµÄ±àÂë±£´æÆğÀ´£¬ÒòÎª´ËÊ±rootÎªÒ¶×Ó½áµã£¬ËùÒÔÍ¨¹ırootÖĞµÄ×Ö·û
 		                                       //À´ÔÚ_fileÊı×éÖĞ£¬ÕÒµ½µÄ¶ÔÓ¦µÄ×Ö·ûÀ´´æ±àÂë
+	}
+}
+
+void filecompressHuff::UNcompressfile(const std::string& s)
+{
+	FILE* FIn = fopen(s.c_str(), "rb");
+	if (nullptr == FIn)
+	{
+		assert(false);
+		return;
+	}
+	//1.»ñÈ¡×Ö·ûĞÅÏ¢
+
+	//ÎÄ¼şºó×º
+	std::string fileback;
+	ReadLine(FIn, fileback);
+
+	//×Ö·ûĞÅÏ¢ĞĞÊı
+	std::string strcount;
+	ReadLine(FIn, strcount);
+	int linecount = atoi(strcount.c_str());
+
+	//×Ö·ûĞÅÏ¢
+	for (int i = 0; i < linecount; i++)
+	{
+		std::string strchcount;
+		ReadLine(FIn, strchcount);
+		if (strchcount.empty())//ËµÃ÷¶Áµ½µÄÊÇ»»ĞĞ£¬ÒòÎªÔ´ÎÄ¼şÖĞ¿Ï¶¨Ò²ÓĞ»»ĞĞ¡£
+		{
+			strchcount += '\n';
+			ReadLine(FIn, strchcount);//ÔÙ¶ÁÒ»ĞĞ
+		}
+		//×Ö·ûĞÅÏ¢ÊÇA:1
+		_file[(unsigned char)strchcount[0]]._count = atoi(strchcount.c_str() + 2);//+2´ú±íÌø¹ıÇ°Á½¸ö×Ö·û£¬Ö±½ÓÕÒµ½´ÎÊı£¬Í¨¹ı×Ö·ûµÄASKIIÂëÖµµ±×ö×Ö·ûÊı×éµÄÏÂ±ê£¬ÕÒµ½×Ö·ûµÄ½á¹¹Ìå¡£
+	}
+	//2.ÖØ¹¹HuffmanÊ÷
+	Huffmantree<Char> t;
+	t.CreatHuffmantree(_file, Char(0));
+
+	FILE* fout = fopen("3.txt","wb");//½âÑ¹ËõÎÄ¼ş
+	//3.½âÑ¹Ëõ
+	char* buff = new char[1024];
+	HuffManTreenode<Char>* cur = t.GetROOT();
+	size_t filesize = cur->_weight._count;//ÎÄ¼ş×Ü´óĞ¡£¬ÒòÎªHuffman¸ù½ÚµãµÄÈ¨ÖµÎªÎÄ¼şµÄ×Ü´óĞ¡¡£
+	size_t uncount = 0;//¼ÇÂ¼½âÑ¹ÁË×Ö½ÚÊı
+	while (true)
+	{
+		size_t rdsize = fread(buff, 1, 1024, FIn);
+		if (rdsize == 0)
+			break;
+		for (size_t i = 0; i < rdsize; i++)//´¦ÀíÃ¿¸ö×Ö½Ú
+		{
+			//Ö»Ğè½«Ò»¸ö×Ö½ÚÖĞµÄ8¸ö±ÈÌØÎ»µ¥¶À´¦Àí
+			for (int pos = 0; pos < 8; pos++)
+			{
+				if (buff[i] & 0x80)//ÅĞ¶ÏÕâ¸ö×Ö½ÚµÄ×î¸ßÎ»ÊÇ1»òÕß0£¬0x80--->1000 0000
+					cur = cur->right;
+				else
+					cur = cur->left;
+
+				buff[i] <<= 1;
+				if (cur->left == nullptr&&cur->right == nullptr)//ÔÚ¸ù½Úµã
+				{
+					uncount++;
+					fputc(cur->_weight._s, fout);//½«Í¨¹ı±àÂë½âÑ¹³öÀ´µÄ×Ö·û£¬Ğ´Èë½âÑ¹ËõÎÄ¼şÖĞ¡£
+					if (uncount == filesize)//½âÑ¹×Ö½ÚÊıºÍÑ¹ËõÎÄ¼ş×Ö½ÚÊıÏàµÈ£¬ËµÃ÷½âÑ¹ÍêÁË¡£
+						break;
+					cur = t.GetROOT();//Ò»¸ö×Ö·û½âÑ¹ºó£¬cur¼ÌĞøÖ¸Ïò¸ù½Úµã£¬¼ÌĞøÍ¨¹ı±àÂëÕÒÒ¶×Ó½áµã£¬½âÑ¹³ö×Ö·û¡£
+				}
+			}
+		}
+	}
+	fclose(FIn);
+	fclose(fout);
+	delete[] buff;
+}
+void filecompressHuff::ReadLine(FILE* FIn,  std::string& strInfo)
+{
+	assert(FIn);
+	while (!feof(FIn))//µ½ÎÄ¼şÄ©Î²ÍË³ö
+	{
+		char ch = fgetc(FIn);
+		if (ch == '\n')
+			break;
+
+		strInfo += ch;
 	}
 }
