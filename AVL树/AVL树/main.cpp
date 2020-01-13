@@ -59,7 +59,30 @@ public:
 			parent->_bf--;//此处我规定，平衡因子是右子树高度减去左子树的高度。所以当左子树加了节点，父结点平衡因子--。
 		else
 			parent->_bf++;
+
+		if (parent->_bf == 0)
+			return;
+		else if (parent->_bf == 1 || parent->_bf == -1)
+		{
+			cur = parent;
+			parent = cur->_parent;
+		}
+		else
+		{
+			//parent的平衡因子大于1，说明parent违反了AVL的性质，说明以parent为根节点的树，已经不平衡了。
+			//所以需要对这棵树进行旋转，使这棵树平衡。
+			if (parent->_bf == 2)
+			{
+				//说明右子树高
+				if (cur->_bf==1)
+				RotateL(pParent);
+			else
+				RotateRL(pParent);
+			}
+		}
 	}
+private:
+	void RotateR(node* parent);//右单旋
 private:
 	node* _root;
 };
