@@ -61,7 +61,7 @@ public:
 		:_size(0)
 		, _total(0)
 	{
-		_table.resize(GetNextPrime(10));
+		_table.resize(GetNextPrime(cap));
 	}
 
 	bool insert(const T& data)
@@ -166,7 +166,7 @@ private:
 	{
 		if (_total * 10 / _table.capacity() >= 7)
 		{
-			Hash<T, DF, is> NewHash(GetNextPrime(_table.capacity());
+			Hash<T, DF, is> NewHash(GetNextPrime(_table.capacity()));
 
 			for (auto e : _table)
 			{
