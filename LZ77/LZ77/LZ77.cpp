@@ -179,8 +179,8 @@ void LZ77::Uncompressfile()
 		return;
 	}
 
-	FILE*  cur = fopen("4.txt", "rb");//偏移到之前的匹配字符 
-
+	FILE* Cur = fopen("4.txt", "rb");//偏移到之前的匹配字符 
+	assert(Cur);
 	UCH bitcount = 0;
 	UCH chflag = 0;
 	while (!feof(FIn))
@@ -195,11 +195,15 @@ void LZ77::Uncompressfile()
 			USH len = fgetc(FIn) + 3;
 			USH Dist = 0;
 			fread(&Dist, sizeof(Dist), 1, FIn);
-			fseek(cur, 0 - Dist, SEEK_END);
-			UCH ch;
+
+			fflush(Fout);//冲刷缓冲区，因为我们往文件里写的数据先写到缓冲区中，当缓冲区满了才写入文件，所以我们需要自行刷新缓冲区。
+			//否则，原字符写入正常，但是长度距离对解压后，就会为空格。
+
+			fseek(Cur,0 - Dist,SEEK_END);
+			UCH ch=0;
 			while (len)
 			{
-				ch = fgetc(cur);
+				ch = fgetc(Cur);
 				fputc(ch, Fout);
 				len--;
 			}
@@ -215,5 +219,5 @@ void LZ77::Uncompressfile()
 	fclose(FIn);
 	fclose(Fout);
 	fclose(Fr);
-	fclose(cur);
+	fclose(Cur);
 }
