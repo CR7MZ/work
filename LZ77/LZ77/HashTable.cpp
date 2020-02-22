@@ -15,6 +15,22 @@ void HashTable::insert(USH& hashaddr, UCH ch, USH pos, USH& matchhead)
 	head[hashaddr]=pos;
 }
 
+void HashTable::Update()
+{
+	for (USH i = 0; i < WSIZE; i++)
+	{
+		if (head[i]>=WSIZE)
+			head[i] -= WSIZE;
+		else
+			head[i] =0;
+
+		if (prev[i]>=WSIZE)
+			prev[i] -= WSIZE;
+		else
+			prev[i] = 0;
+	}
+}
+
 void HashTable::HashFunc(USH& hashaddr, UCH ch)
 {
 	hashaddr = (((hashaddr) << H_SHIFT()) ^ (ch)) & HASH_MASK;

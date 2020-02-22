@@ -32,7 +32,7 @@ void LZ77::compressfile(const std::string& filepath)
 
 	//从文件中读取64K的内容到pWin中
 	fseek(FIn, 0, SEEK_SET);
-	USH LookAhead = fread(pWin, 1, 2 * WSIZE,FIn);
+	size_t LookAhead = fread(pWin, 1, 2 * WSIZE,FIn);
 
 	USH hashaddr = 0;
 	for (int i = 0; i < MIN_MATCH - 1; i++)
@@ -97,16 +97,60 @@ void LZ77::compressfile(const std::string& filepath)
 			}
 			start++;
 		}
+		if (LookAhead <= LOOKAHEAD)
+			fillWin(FIn,LookAhead);
 	}
 	if (bitcount > 0 && bitcount < 8)
 	{
 		chflag <<= (8 - bitcount);
 		fputc(chflag, FE);
 	}
- 	fclose(FIn);
-	fclose(FOut);
-	fclose(FE);
+	
+ 	fclose(FIn); //原文件
+	fclose(FE);//标记文件
+
+	Merge(FOut, FileSize);//将压缩数据、标记数据、标记数据总字节数、源文件大小
+
+	fclose(FOut);//压缩文件
 }
+
+void LZ77::fillWin(FILE* FIn, size_t& lookahead)
+{
+	if (start >= WSIZE)
+	{
+		//将右窗口的数据搬移到左窗
+		memcpy(pWin, pWin + WSIZE, WSIZE);
+		memset(pWin + WSIZE, 0, WSIZE);
+		start -= WSIZE;
+
+		//更新哈希表
+		ht.Update();
+
+		//填充数据，想右半部分
+		if (!feof(FIn))
+			lookahead += fread(pWin + WSIZE, 1, WSIZE, FIn);
+	}
+}
+
+void LZ77::Merge(FILE* fout, ULL filesize)
+{
+	FILE* finf = fopen("3.txt", "rb");
+
+	size_t flagsize = 0;
+	UCH* PreadBuff = new UCH[1024];
+	while (true)
+	{
+		size_t rdsize = fread(PreadBuff, 1, 1024, finf); 
+		if (rdsize == 0)
+			break;
+		fwrite(PreadBuff, 1, rdsize, fout); 
+		flagsize += rdsize;
+	}
+	fwrite(&flagsize, sizeof(flagsize), 1, fout);
+	fwrite(&filesize, sizeof(filesize), 1, fout);
+	delete[] PreadBuff;
+}
+
 void LZ77::WriteFlag(FILE* file, UCH& charflag, UCH& bitcount, bool islen )
 {
 	charflag <<= 1;
@@ -156,7 +200,8 @@ USH LZ77::LongestMatch(USH matchhead, USH& curMatchDist)
 
 void LZ77::Uncompressfile()
 {
-	//打开压缩文件
+
+	//打开压缩文件，只获取压缩数据
 	FILE* FIn=fopen("2.lzp", "rb");
 	if (FIn == nullptr)
 	{
@@ -164,30 +209,34 @@ void LZ77::Uncompressfile()
 		return;
 	}
 
-	//打开标记文件
-	FILE* Fr = fopen("3.txt", "rb");
-	if (Fr == nullptr)
-	{
-		cout << "数据打开失败！！！" << endl;
-		return;
-	}
-
-	FILE* Fout = fopen("4.txt", "wb");
-	if (Fout == nullptr)
-	{
-		cout << "打开解压文件失败！！！" << endl;
-		return;
-	}
-
-	FILE* Cur = fopen("4.txt", "rb");//偏移到之前的匹配字符 
+	FILE* Cur = fopen("2.lzp", "rb");//从后面获取其他压缩信息
 	assert(Cur);
+
+	//读取源文件大小
+	ULL filesize=0;
+	fseek(Cur, 0 - sizeof(filesize) , SEEK_END);
+	fread(&filesize, sizeof(filesize), 1, Cur);
+
+	//读取标记字节总数
+	size_t flagsize = 0;
+	fseek(Cur, 0 - sizeof(filesize) - sizeof(flagsize), SEEK_END);
+	fread(&flagsize, sizeof(flagsize), 1, Cur);
+	
+	//将读取标记信息的指针cur移到标记信息的前面
+	fseek(Cur, 0 - sizeof(filesize) - sizeof(flagsize) - flagsize, SEEK_END);
+
+	FILE* Fout = fopen("4.txt", "wb");//解压缩文件
+
+	FILE* FR = fopen("4.txt", "rb");
+
 	UCH bitcount = 0;
 	UCH chflag = 0;
-	while (!feof(FIn))
+	ULL count = 0;//如果大于等于原文件大小，说明解压完
+	while (count<filesize)
 	{
 		if (0 == bitcount)
 		{
-			chflag = fgetc(Fr);
+			chflag = fgetc(Cur);
 			bitcount = 8;
 		}
 		if (chflag & 0x80)
@@ -196,28 +245,33 @@ void LZ77::Uncompressfile()
 			USH Dist = 0;
 			fread(&Dist, sizeof(Dist), 1, FIn);
 
-			fflush(Fout);//冲刷缓冲区，因为我们往文件里写的数据先写到缓冲区中，当缓冲区满了才写入文件，所以我们需要自行刷新缓冲区。
+			fflush(Fout);
+			//冲刷缓冲区，因为我们往文件里写的数据先写到缓冲区中，当缓冲区满了才写入文件，所以我们需要自行刷新缓冲区。
 			//否则，原字符写入正常，但是长度距离对解压后，就会为空格。
 
-			fseek(Cur,0 - Dist,SEEK_END);
+			count += len;
+
+			fseek(FR, 0 - Dist, SEEK_END);
 			UCH ch=0;
 			while (len)
 			{
-				ch = fgetc(Cur);
+				ch = fgetc(FR);
 				fputc(ch, Fout);
 				len--;
+				fflush(Fout);
 			}
 		}
 		else
 		{
 			UCH ch = fgetc(FIn);
 			fputc(ch, Fout);
+			count += 1;
 		}
 		chflag <<= 1;
 		bitcount--;
 	}
 	fclose(FIn);
 	fclose(Fout);
-	fclose(Fr);
+	fclose(FR);
 	fclose(Cur);
 }
