@@ -3,7 +3,6 @@
 #include<string>
 #include<queue>
 using namespace std;
-
 //思路：
 //用队列，将字符串放入队列中，出队n次，将出队的数据按顺序放回队列尾部。将队列中的字符合而成字符串。
 string LeftRotateString(string str, int n) {
