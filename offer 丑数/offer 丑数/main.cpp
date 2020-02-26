@@ -2,6 +2,7 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>//包含min函数
+
 //思路解析：https://blog.csdn.net/CR7lmz/article/details/104236166
 int GetUglyNumber_Solution(int index) {
 	if (index<7)
