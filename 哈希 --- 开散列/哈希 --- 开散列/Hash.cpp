@@ -16,10 +16,80 @@ struct HashNode
 	HashNode<T>* _next;
 };
 
-template<class T,class DF=DFf<T>>
-class Hash
+template<class T, class DF = DFf<T>>//因为我们封装的迭代器要用到哈希函数，但是哈希类的在后面定义的，
+class Hash;                        //因此我们在构造迭代器的时候并不知道此时哈希类型是什么样子，所以需要提前声明，才能封装指针。、、
+
+template<class T,class DF = DFf()>//因为用到哈希类，所以也要把哈希函数模板参数传过来。
+struct HashIterator
 {
 	typedef HashNode<T> node;
+	typedef HashIterator<T,DF> self;
+	HashIterator(node* pNode = nullptr, Hash<T,DF>* ht = nullptr)
+		:_pNode(pNode)
+		, _ht(ht)
+	{}
+
+	T& operator* ()
+	{
+		return _pNode->_val;
+	}
+
+	T* operator->()
+	{
+		return &(_pNode->_val);
+	}
+
+	self& operator++()//此处因为我们处理的是链表，在next函数中结点已经移动了，所以返回值可以使引用也可以不是
+	{                 //但是若处理一段连续的空间，就必须返回引用，因为，如果不反悔引用，就相当于我们的指针并没有动。
+  		Next();
+		return *this;
+	}
+
+	self operator++(int)
+	{
+		self tmp(*this);
+		Next();
+		return tmp;
+	}
+
+	bool operator!=(const self &s)
+	{
+		return _pNode != s._pNode;
+	}
+
+	bool operator==(const self &s)
+	{
+		return _pNode == s._pNode;
+	}
+
+	void Next()
+	{
+		if (_pNode->_next)//如果有值，到下一个结点
+			_pNode = _pNode->_next;
+		else                    //找下一个有值的桶
+		{
+			size_t Nextno = _ht->HashFunc(_pNode->_val) + 1;//获得下一个桶号
+			for (; Nextno < _ht->_table.size(); Nextno++)
+			{
+				if (_ht->_table[Nextno])
+				{
+					_pNode = _ht->_table[Nextno];
+					return;
+				}
+			}
+			_pNode = nullptr;
+		}
+	}
+	node* _pNode;
+	Hash<T,DF>* _ht;
+};
+
+template<class T,class DF>
+class Hash
+{
+	friend struct HashIterator<T,DF>;
+	typedef HashNode<T> node;
+	typedef HashIterator<T, DF> iterator;
 public:
 	Hash(size_t cap)
 		:_size(0)
@@ -110,6 +180,21 @@ public:
 			cout << "nullptr" << endl;
 		}
 	}
+
+	iterator begin()
+	{
+		for (size_t i = 0; i < _table.capacity(); i++)//找第一个非空桶
+		{
+			if (_table[i])
+				return iterator(_table[i],this);
+		}
+		return end();
+	}
+
+	iterator end()
+	{
+		return iterator(nullptr, this);
+	}
 private:
 	void check()
 	{
@@ -137,15 +222,20 @@ int main()
 	cout << ht.Size() << endl;
 	ht.print();*/
 
-	ht.insertunique(25);
+	ht.insertunique(58);
 	ht.insertunique(22);
-	cout << ht.Size() << endl;
+	auto it = ht.begin();
+	while (it != ht.end())
+	{
+		cout << *it << " ";
+		it++; 
+	}
+	cout << endl;
 	ht.print();
-
-	if (ht.find(25))
-		cout << " in " << endl;
-	else
-		cout << " no " << endl;
+	//if (ht.find(25))
+	//	cout << " in " << endl;
+	//else
+	//	cout << " no " << endl;
 	system("pause");
 	return 0;
 }
