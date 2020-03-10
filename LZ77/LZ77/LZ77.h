@@ -16,12 +16,11 @@ public:
 	~LZ77();
 	void compressfile(const std::string& str);
 	void Uncompressfile();
-	USH LongestMatch(USH matchhead,USH& curMatchDist);
+	USH LongestMatch(USH matchhead,USH& curMatchDist,USH start);
 	void WriteFlag(FILE* file, UCH& charflag, UCH& bitcount, bool islen);
 	void Merge(FILE* file,ULL filesize);//将标记文件放到压缩数据文件中。合并起来
-	void fillWin(FILE* FIn,size_t& lookahead);  //填充数据
+	void fillWin(FILE* FIn,size_t& lookahead,USH& start);  //填充数据
 private:
 	HashTable ht;
 	UCH* pWin;
-	USH start;
 };

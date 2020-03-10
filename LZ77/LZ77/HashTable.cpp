@@ -6,28 +6,42 @@ HashTable::HashTable(USH size)
 {
 	memset(prev, 0, size * 2 * sizeof(USH));
 }
+HashTable::~HashTable()
+{
+	delete[] prev;
+	prev = nullptr;
+}
 void HashTable::insert(USH& hashaddr, UCH ch, USH pos, USH& matchhead)
 {
 	HashFunc(hashaddr, ch);//º∆À„π˛œ£µÿ÷∑
 
 	matchhead = head[hashaddr];
-	prev[pos&HASH_MASK] = head[hashaddr];
-	head[hashaddr]=pos;
+ 	prev[pos&HASH_MASK] = head[hashaddr];
+	head[hashaddr]= pos;
 }
 
 void HashTable::Update()
 {
 	for (USH i = 0; i < WSIZE; i++)
 	{
-		if (head[i]>=WSIZE)
+		if (head[i] >= WSIZE)
+		{
 			head[i] -= WSIZE;
+		}
 		else
-			head[i] =0;
+		{
+			head[i] = 0;
+		}	
 
-		if (prev[i]>=WSIZE)
+		if (prev[i] >= WSIZE)
+		{
 			prev[i] -= WSIZE;
+		}	
 		else
+		{
 			prev[i] = 0;
+		}
+			
 	}
 }
 

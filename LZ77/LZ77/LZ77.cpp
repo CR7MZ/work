@@ -3,7 +3,6 @@
 LZ77::LZ77()
 	:pWin(new UCH[WSIZE*2])
 	, ht(WSIZE)
-	, start(0)
 {}
 LZ77::~LZ77()
 {
@@ -35,11 +34,13 @@ void LZ77::compressfile(const std::string& filepath)
 	size_t LookAhead = fread(pWin, 1, 2 * WSIZE,FIn);
 
 	USH hashaddr = 0;
-	for (int i = 0; i < MIN_MATCH - 1; i++)
+	for (USH i = 0; i < MIN_MATCH - 1; i++)
 		ht.HashFunc(hashaddr, pWin[i]);
 
 	FILE* FOut = fopen("2.lzp", "wb");
 	assert(FOut);
+
+	USH start = 0;
 
 	USH matchhead = 0;
 	USH curMatchLength = 0; //长度
@@ -52,11 +53,11 @@ void LZ77::compressfile(const std::string& filepath)
 	FILE* FE = fopen("3.txt", "wb");
 	assert(FE);
 
-	//LookAhead表示线性缓冲区的个数
+	//LookAhead表示先行缓冲区的个数
 	while (LookAhead)
 	{
 		//将一个字符串插入哈希表中
-		ht.insert(hashaddr, pWin[start + 2],start, matchhead);
+		ht.insert(hashaddr, pWin[start + 2], start, matchhead);
 
 		curMatchLength = 0;
 		curMatchDist = 0;
@@ -64,7 +65,7 @@ void LZ77::compressfile(const std::string& filepath)
 		//获取匹配链头，看其是有数值
 		if (matchhead)//说明匹配
 		{
-			curMatchLength = LongestMatch(matchhead, curMatchDist);
+			curMatchLength = LongestMatch(matchhead, curMatchDist,start);
 		}
 		if (curMatchLength < MIN_MATCH)//如果匹配长度小于最小长度或者没找到匹配，将原字符写入压缩文件中，进行下一个在字符的
 		{
@@ -98,7 +99,7 @@ void LZ77::compressfile(const std::string& filepath)
 			start++;
 		}
 		if (LookAhead <= LOOKAHEAD)
-			fillWin(FIn,LookAhead);
+			fillWin(FIn,LookAhead,start);
 	}
 	if (bitcount > 0 && bitcount < 8)
 	{
@@ -109,18 +110,18 @@ void LZ77::compressfile(const std::string& filepath)
  	fclose(FIn); //原文件
 	fclose(FE);//标记文件
 
-	Merge(FOut, FileSize);//将压缩数据、标记数据、标记数据总字节数、源文件大小
+	//Merge(FOut, FileSize);//将压缩数据、标记数据、标记数据总字节数、源文件大小
 
 	fclose(FOut);//压缩文件
 }
 
-void LZ77::fillWin(FILE* FIn, size_t& lookahead)
+void LZ77::fillWin(FILE* FIn, size_t& lookahead,USH& start)
 {
 	if (start >= WSIZE)
 	{
 		//将右窗口的数据搬移到左窗
 		memcpy(pWin, pWin + WSIZE, WSIZE);
-		memset(pWin + WSIZE, 0, WSIZE);
+		//memset(pWin + WSIZE, 0, WSIZE);
 		start -= WSIZE;
 
 		//更新哈希表
@@ -165,7 +166,7 @@ void LZ77::WriteFlag(FILE* file, UCH& charflag, UCH& bitcount, bool islen )
 		bitcount = 0;
 	}
 }
-USH LZ77::LongestMatch(USH matchhead, USH& curMatchDist)
+USH LZ77::LongestMatch(USH matchhead, USH& curMatchDist,USH start)
 {
 	UCH curMatchlen = 0;//一次匹配的长度
 	UCH MaxMatchlen = 0;//最大的长度

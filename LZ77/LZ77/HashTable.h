@@ -8,7 +8,7 @@ typedef unsigned long long ULL;
 
 const USH  WSIZE = 32 * 1024;
 const USH HASH_BITS = 15;//哈希地址有多少个比特位
-const USH HASH_SIZE = (1 << HASH_BITS);//哈希地址个数
+const USH HASH_SIZE = (1 << 15);//哈希地址个数
 const USH HASH_MASK = HASH_SIZE - 1;
 
 const USH MIN_MATCH = 3;
@@ -18,6 +18,7 @@ class HashTable
 {
 public:
 	HashTable(USH size);
+	~HashTable();
 	void insert(USH& hashaddr,UCH ch,USH pos,USH& matchhead);
 	void HashFunc(USH& hashaddr, UCH ch);
 	USH Getnext(USH matchhead);
