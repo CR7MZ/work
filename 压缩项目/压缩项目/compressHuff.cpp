@@ -1,4 +1,5 @@
 #include"fileCompressHuff.h"
+#include "Huffman Tree.hpp"
 #include<assert.h>
 #include<string>
 filecompressHuff::filecompressHuff()
@@ -20,6 +21,7 @@ void filecompressHuff::compressfile(const std::string& s)
 		assert(false);
 		return;
 	}
+
 	unsigned char* buff = new unsigned char[1024];//用来保存从文件读出来的数据。
 	//因为字符范围是-128-127，负数是不能作为下标的，所以不能用字符的ASKii码作为数组下标，所以用无符号类型。
 	size_t readsize = 0;
@@ -44,7 +46,7 @@ void filecompressHuff::compressfile(const std::string& s)
 
 	//4.用获取到的字符编码重新改写原文件
 
-	FILE* fout = fopen("2.txt", "wb");//用来存放重写内容的文件，就是压缩文件。
+	FILE* fout = fopen("3.lzp", "wb");//用来存放重写内容的文件，就是压缩文件。
 	if (nullptr == fout)
 	{
 		assert(false);
@@ -91,6 +93,7 @@ void filecompressHuff::compressfile(const std::string& s)
 
 	delete[] buff;
 	fclose(fIn);
+	fclose(fout);
 }
 
 std::string filecompressHuff::getfileback(const std::string& filename)//得到文件后缀
@@ -194,7 +197,7 @@ void filecompressHuff::UNcompressfile(const std::string& s)
 	Huffmantree<Char> t;
 	t.CreatHuffmantree(_file, Char(0));
 
-	FILE* fout = fopen("3.txt","wb");//解压缩文件
+	FILE* fout = fopen("4.lzp","wb");//解压缩文件
 	//3.解压缩
 	char* buff = new char[1024];
 	HuffManTreenode<Char>* cur = t.GetROOT();
@@ -207,6 +210,12 @@ void filecompressHuff::UNcompressfile(const std::string& s)
 			break;
 		for (size_t i = 0; i < rdsize; i++)//处理每个字节
 		{
+			if (cur->left == nullptr&&cur->right == nullptr)
+			{
+				if (uncount == filesize)
+					break;
+				cur = t.GetROOT();
+			}
 			//只需将一个字节中的8个比特位单独处理
 			for (int pos = 0; pos < 8; pos++)
 			{
@@ -227,9 +236,10 @@ void filecompressHuff::UNcompressfile(const std::string& s)
 			}
 		}
 	}
+	delete[] buff;
 	fclose(FIn);
 	fclose(fout);
-	delete[] buff;
+
 }
 void filecompressHuff::ReadLine(FILE* FIn,  std::string& strInfo)
 {

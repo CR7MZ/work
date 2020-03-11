@@ -10,7 +10,7 @@ LZ77::~LZ77()
 	delete[] pWin;
 	pWin = nullptr;
 }
-void LZ77::compressfile(const std::string& filepath)
+void LZ77::Compressfile(const std::string& filepath)
 {
 	FILE* FIn = fopen(filepath.c_str(), "rb");
 	if (nullptr == FIn)
@@ -106,12 +106,16 @@ void LZ77::compressfile(const std::string& filepath)
 		fputc(chflag, FE);
 	}
 	
- 	fclose(FIn); //原文件
+ 
 	fclose(FE);//标记文件
 
 	Merge(FOut, FileSize);//将压缩数据、标记数据、标记数据总字节数、源文件大小
-
+	fclose(FIn); //原文件
 	fclose(FOut);//压缩文件
+	if (remove("3.txt") != 0)
+	{
+		std::cout << "remove error " << std::endl;
+	}
 }
 
 void LZ77::fillWin(FILE* FIn, size_t& lookahead)
@@ -149,6 +153,7 @@ void LZ77::Merge(FILE* fout, ULL filesize)
 	fwrite(&flagsize, sizeof(flagsize), 1, fout);
 	fwrite(&filesize, sizeof(filesize), 1, fout);
 	delete[] PreadBuff;
+	fclose(finf);
 }
 
 void LZ77::WriteFlag(FILE* file, UCH& charflag, UCH& bitcount, bool islen )
@@ -176,7 +181,7 @@ USH LZ77::LongestMatch(USH matchhead, USH& curMatchDist)
 	do
 	{
 		UCH* pstart = pWin + start;
-		UCH* pend = pWin + MAX_MATCH;
+		UCH* pend = pstart + MAX_MATCH;
 
 		UCH* pMatchstart = pWin + matchhead;
 
@@ -198,18 +203,18 @@ USH LZ77::LongestMatch(USH matchhead, USH& curMatchDist)
 	return MaxMatchlen;
 }
 
-void LZ77::Uncompressfile()
+void LZ77::Uncompressfile(const string& path)
 {
 
 	//打开压缩文件，只获取压缩数据
-	FILE* FIn=fopen("2.lzp", "rb");
+	FILE* FIn=fopen(path.c_str(), "rb");
 	if (FIn == nullptr)
 	{
 		cout << "解压失败！！！" << endl;
 		return;
 	}
 
-	FILE* Cur = fopen("2.lzp", "rb");//从后面获取其他压缩信息
+	FILE* Cur = fopen(path.c_str(), "rb");//从后面获取其他压缩信息
 	assert(Cur);
 
 	//读取源文件大小
@@ -225,9 +230,9 @@ void LZ77::Uncompressfile()
 	//将读取标记信息的指针cur移到标记信息的前面
 	fseek(Cur, 0 - sizeof(filesize) - sizeof(flagsize) - flagsize, SEEK_END);
 
-	FILE* Fout = fopen("4.txt", "wb");//解压缩文件
+	FILE* Fout = fopen("5.txt", "wb");//解压缩文件
 
-	FILE* FR = fopen("4.txt", "rb");
+	FILE* FR = fopen("5.txt", "rb");
 
 	UCH bitcount = 0;
 	UCH chflag = 0;

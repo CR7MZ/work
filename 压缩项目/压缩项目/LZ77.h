@@ -1,5 +1,4 @@
 #pragma once 
-#define _CRT_SECURE_NO_WARNINGS
 #include"HashTable.h"
 #include<string>
 #include<iostream>
@@ -14,8 +13,8 @@ class LZ77
 public:
 	LZ77();
 	~LZ77();
-	void compressfile(const std::string& str);
-	void Uncompressfile();
+	void Compressfile(const std::string& str);
+	void Uncompressfile(const std::string& str);
 	USH LongestMatch(USH matchhead,USH& curMatchDist);
 	void WriteFlag(FILE* file, UCH& charflag, UCH& bitcount, bool islen);
 	void Merge(FILE* file,ULL filesize);//将标记文件放到压缩数据文件中。合并起来

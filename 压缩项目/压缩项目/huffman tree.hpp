@@ -2,6 +2,7 @@
 //哈夫曼树的创建
 #include<queue>
 #include<vector>
+#include<iostream>
 
 template<class T>
 struct HuffManTreenode
@@ -23,7 +24,7 @@ class Less//给出用大于方式来比较，生成小队的方法
 {
 	typedef HuffManTreenode<T> node;
 public:
-	bool operator()(node* left, node* right)
+	bool operator()(const node* left,const node* right)
 	{
 			return left->_weight > right->_weight;
 	}
@@ -45,7 +46,7 @@ public:
 		//invalid用来提供无效的权值,本项目中的意思就是将次数为零的字符不放进堆里。
 	{
 		//1.构建森林
-		std::priority_queue<node,std::vector<node*>,Less<T>> q;//因为优先级队列默认情况下用小于方式来比较生成的是大堆，但是我们需要的是小堆，所以需要给出用大于方式来比较
+		std::priority_queue<node*,std::vector<node*>,Less<T>> q;//因为优先级队列默认情况下用小于方式来比较生成的是大堆，但是我们需要的是小堆，所以需要给出用大于方式来比较
 		for (auto e : weight)
 		{
 			if (e == invalid)
