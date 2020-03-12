@@ -11,7 +11,7 @@ HashTable::~HashTable()
 	delete[] prev;
 	prev = nullptr;
 }
-void HashTable::insert(USH& hashaddr, UCH ch, USH pos, USH& matchhead)
+void HashTable::insert(USH& matchhead, UCH ch, USH pos, USH& hashaddr)
 {
 	HashFunc(hashaddr, ch);//º∆À„π˛œ£µÿ÷∑
 

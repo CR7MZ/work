@@ -19,7 +19,7 @@ class HashTable
 public:
 	HashTable(USH size);
 	~HashTable();
-	void insert(USH& hashaddr,UCH ch,USH pos,USH& matchhead);
+	void insert(USH& matchhead, UCH ch, USH pos, USH& hashaddr);
 	void HashFunc(USH& hashaddr, UCH ch);
 	USH Getnext(USH matchhead);
 	void Update();
