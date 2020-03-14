@@ -166,6 +166,21 @@ public:
 		return _size;
 	}
 
+	void Clear()
+	{
+		for (int i = 0; i < _table.size(); i++)
+		{
+			node* cur = _table[i];
+			while (cur)
+			{
+				_table[i] = cur->_next;
+				delete cur;
+				_size--;
+				cur = _table[i];
+			}
+		}
+	}
+
 	void print()
 	{
 		for (size_t i = 0; i < _table.size(); i++)
@@ -195,10 +210,42 @@ public:
 	{
 		return iterator(nullptr, this);
 	}
+
+	void Swap(Hash& ht)
+	{
+		_table.swap(ht._table);
+		std::swap(_size,)_size = ht._size;
+	}
 private:
 	void check()
 	{
+		if (_size == _table.capacity())
+		{
+			//新建立一个新容量的哈希表
+			Hash<T,DF> NewHash(_table.capacity());
 
+			//将原哈希桶中结点，放入新的哈希桶。（不需要用插入接口，效率太低，直接将之前的结点放到新的哈希桶的对应哈希地址中）
+			for (int HashBu = 0; HashBu < _table.capacity(); HashBu++)
+			{
+				node* cur = _table[HashBu];
+				while (cur)
+				{
+					//先计算这个结点的新哈希地址
+					int Hashaddr = NewHash.HashFunc(cur->_val);
+
+					//将cur从从该桶中删除
+					_table[HashBu] = cur->_next;
+
+					//头插进新桶
+					cur->_next = NewHash._table[Hashaddr];
+					NewHash._table[Hashaddr] = cur;
+
+					//放回原来的桶中继续搬移
+					cur = _table[HashBu];
+				}
+			}
+			this->Swap(NewHash);
+		}
 	}
 	size_t HashFunc(const T& data)const
 	{
@@ -211,7 +258,7 @@ private:
 
 int main()
 {
-	Hash<int> ht(10);
+	Hash<int,DFf<int>> ht(10);
 	int arr[] = { 1, 5, 7, 6, 12, 23 };
 	for (auto e : arr)
 		ht.insertunique(e);
@@ -236,6 +283,7 @@ int main()
 	//	cout << " in " << endl;
 	//else
 	//	cout << " no " << endl;
+	ht.Clear();
 	system("pause");
 	return 0;
 }
