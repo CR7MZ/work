@@ -20,7 +20,7 @@ struct HuffManTreenode
 };
 
 template<class T>
-class Less//给出用大于方式来比较，生成小队的方法
+class Less//给出用大于方式来比较，生成小堆的方法
 {
 	typedef HuffManTreenode<T> node;
 public:
