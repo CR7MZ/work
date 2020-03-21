@@ -13,6 +13,7 @@ struct AVLtreenode
 	T _data;
 	int _bf;
 };
+
 template<class T>
 class AVLtree
 {
