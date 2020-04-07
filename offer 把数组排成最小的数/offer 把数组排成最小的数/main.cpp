@@ -5,6 +5,7 @@
 #include<algorithm>
 using namespace std;
 //解题思路：https://blog.csdn.net/CR7lmz/article/details/104225348
+
 class solution
 {
 	static bool compare(const string& str1, const string& str2)//定义sort函数的比较器
