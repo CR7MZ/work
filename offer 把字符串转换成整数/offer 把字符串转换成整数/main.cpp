@@ -5,6 +5,7 @@
 //先判断第一个字符是不是符号。
 //1.为+，i标记为1。下面转换从第二个开始。2.为-，i标记为1，并且将Check置为ture 代表转换成数字后，要加符号。
 //如果后面的字符串中没有其他字符，则转换为数字。用sum保存，此处sum为double类型，因为考虑到int的最大值，最小值问题
+
 double StrToInt(std::string str) {
 	size_t i = 0;
 	bool Check = false;
