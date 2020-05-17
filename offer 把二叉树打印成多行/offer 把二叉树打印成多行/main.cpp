@@ -10,7 +10,6 @@ struct TreeNode {
 		val(x), left(NULL), right(NULL) {
 	}
 };
-
 //题目：https://www.nowcoder.com/questionTerminal/445c44d982d04483b04a54f298796288?f=discussion
 //用两个队列q1,q2，q1保存的奇数行的数值，q2保存偶数行内容。每次每个队列打印自己的内容时，将下一行的内容保存在另一个队列中。依次类推。
 class Solution {
