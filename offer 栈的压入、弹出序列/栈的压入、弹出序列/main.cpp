@@ -3,6 +3,7 @@
 #include<stack>
 #include<vector>
 using namespace std;
+
 //思路：
 //定义一个栈s来保存pushV从右向左的每个元素。s每压入一个pushV的元素，将这个元素和popV第一个元素进行比较，若相等则删除s栈顶，进行popV下一个元素的比较
 //若不相等，继续压入pushV的元素。若pushV中的元素已经全部压入到栈中，但此时s中仍有元素，并且栈顶元素和此时popV中第一个元素不相等。说明不是。
