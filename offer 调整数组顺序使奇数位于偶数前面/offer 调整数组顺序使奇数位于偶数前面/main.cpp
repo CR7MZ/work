@@ -1,24 +1,19 @@
-//题目：https://www.nowcoder.com/questionTerminal/beb5aa231adc45b2a5dcc5b62c93f593?f=discussion
+//题目：https://leetcode-cn.com/problems/diao-zheng-shu-zu-shun-xu-shi-qi-shu-wei-yu-ou-shu-qian-mian-lcof/submissions/
 #include<iostream>
 #include<vector>
-//思路：定义一个数组来放偶数。遍历数组，遇到偶数将其放入新数组中，并且将其从原数组中删除。这样即将奇数、偶数分开。并且相对位置不变。
-//最后将所有偶数插入原数组中。
-void reOrderArray(std::vector<int> &array) {
-	int size = array.size();
-	std::vector<int> tmp;
-	auto it = array.begin();
-	while (it != array.end())
-	{
-		if ((*it) % 2 == 0)
-		{
-			tmp.push_back(*it);
-			it = array.erase(it);
+//思路：定义两个指针i,j，分别从头和尾开始遍历，i遇见偶数停下，j遇见奇数停下，交换i,j指向的值
+vector<int> exchange(vector<int>& nums) {
+	int i = 0, j = nums.size() - 1;
+	while (i < j){
+		while (i <= j && nums[i] % 2 == 1){
+			++i;
 		}
-		else
-			it++;
+		while (i <= j && nums[j] % 2 == 0){
+			--j;
+		}
+		if (i < j){
+			swap(nums[i], nums[j]);
+		}
 	}
-	for (auto e : tmp)
-	{
-		array.push_back(e);
-	}
+	return nums;
 }
