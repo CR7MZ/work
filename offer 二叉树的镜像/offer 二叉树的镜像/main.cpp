@@ -13,6 +13,8 @@ struct TreeNode
 		,right(nullptr)
 	{}
 };
+
+//递归解法
 void Mirror(TreeNode *pRoot) {
 	if (pRoot == nullptr)
 		return;
@@ -25,3 +27,20 @@ void Mirror(TreeNode *pRoot) {
 	Mirror(pRoot->left);
 	Mirror(pRoot->right);
 }
+
+//使用栈，非递归
+TreeNode* mirrorTree(TreeNode* root) {
+          stack<TreeNode*> s;
+          s.push(root);
+          while(!s.empty()){
+              TreeNode* tmp = s.top();
+              s.pop();
+              if (!tmp) continue;
+              TreeNode* res = tmp->left;
+              tmp->left = tmp->right;
+              tmp->right = res;
+              if (tmp->right != nullptr) s.push(tmp->right);
+              if (tmp->left != nullptr) s.push(tmp->left);
+          }
+          return root;
+    }
