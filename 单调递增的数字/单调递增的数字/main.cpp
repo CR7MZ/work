@@ -4,7 +4,6 @@ using namespace std;
 
 //题目：https://leetcode-cn.com/problems/monotone-increasing-digits/
 //解析：从后往前扫描数字，如果发现当前数字比起左边数字小，将当前数字左边数字-1，当前数字右边全为9
-
 class Solution {
 public:
 	int monotoneIncreasingDigits(int N) {
