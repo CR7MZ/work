@@ -7,8 +7,11 @@ using namespace std;
 //思路：定义四个变量left、top、right、butt来规定矩形的左、上、右、下边界。
 //打印第一圈的数据，当一圈数据打印结束后，四个变零分别前进后退一位，继续打印下一层。
 vector<int> printMatrix(vector<vector<int> > matrix) {
-	int left = 0, top = 0, butt = matrix.size() - 1, right = matrix[0].size() - 1;
 	vector<int> v;
+	if(maxtrix.empty()){           //需要判空，否则可能无法通过
+		return v;
+	}
+	int left = 0, top = 0, butt = matrix.size() - 1, right = matrix[0].size() - 1;
 	while (left <= right&&top <= butt)
 	{
 		for (int i = left; i <= right; i++)
