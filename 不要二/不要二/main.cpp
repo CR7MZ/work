@@ -20,13 +20,10 @@ using namespace std;
 int main()
 
 {
-	vector<int> v[1000];
-	for (int i = 0; i < 1000; i++)//将数组初始化为0
-	{
-		v[i].resize(1000, 0);
-	}
 	int W, H;//H为行，W为列
 	cin >> W >> H;
+	vector<vector<int>> v(n,vector<int>(m,0));
+	
 	for (int i = 0; i < H; i++)//从每行看
 	{
 		if (i % 4 == 0 || i % 4 == 1)//当行的坐标与4的余数为0或者1
@@ -34,7 +31,7 @@ int main()
 			for (int j = 0; j < W; j++)
 			{
 				if (j % 4 == 0 || j % 4 == 1)//从列看，同样当列的坐标与4的余数为0或者1时，可以放蛋糕
-					v[i][j] = 1;
+					count++;
 			}
 		}
 		else//当行的坐标与4的余数为2或者3
@@ -42,19 +39,11 @@ int main()
 			for (int j = 0; j < W; j++)
 			{
 				if (j % 4 == 2 || j % 4 == 3)//从列看，同样当列的坐标与4的余数为2或者3时，可以放蛋糕
-					v[i][j] = 1;
+					count++;
 			}
 		}
 	}
-	int count = 0;
-	for (int i = 0; i < H; i++)
-	{
-		for (int j = 0; j < W; j++)
-		{
-			if (v[i][j] == 1)
-				count++;
-		}
-	}
-	cout << count;
+	
+	cout << count<endl;
 	return 0;
 }
