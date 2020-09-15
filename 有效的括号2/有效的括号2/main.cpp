@@ -3,26 +3,19 @@
 using namespace std;
 //题目：https://leetcode-cn.com/problems/valid-parentheses/
 
+//根据askii值来判断是否匹配。因为：
+//'(' + 1 == ')'  
+//'{' + 2 == '}'  
+//'[' + 2 == ']'
 
 bool isValid(string s) {
-	stack<char> c;
-	for (auto e : s){
-		if (c.empty()){
-			c.push(e);
-			continue;
-		}
-		if (e == ')' && c.top() != '(' || e == '}' && c.top() != '{' || e == ']' && c.top() != '['){
-			c.push(e);
-		}
-		else if (e == ')' && c.top() == '(' || e == '}' && c.top() == '{' || e == ']' && c.top() == '['){
-			c.pop();
-		}
-		else {
-			c.push(e);
-		}
-	}
-	if (!c.empty()){
-		return false;
-	}
-	return true;
+	stack<char> st;
+        for(auto e : s){
+            if(!st.empty()&&(st.top()+1 == e || st.top()+2 == e)){
+                st.pop();
+            } else {
+                st.push(e);
+            }
+        }
+        return st.empty();
 }
